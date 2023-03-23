@@ -1,1 +1,7 @@
 .DS_Store
+/database/home/tests.py
+/VENV/*
+.idea/*
+/database.egg-info/*
+/database/__pycache__/*
+sqltutorial.sqlite
