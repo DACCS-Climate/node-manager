@@ -1,6 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- This HTML template will be used by the Chameleon templater to pass the name variables set in views.py-->
+    <title>Register</title>
+</head>
+<body>
+<h1>Add Node</h1>
+<a href="${request.route_url('node_home')}">Node Home</a>
+<br>
+<a href="${request.route_url('node_admin')}">Node Admin</a>
 
-<h1>${page_title} - $(name)</h1>
 
+<br>
+<a href="${request.route_url('node_register')}">Node Register</a>
 <div class="admin-content">
 
     <form>
@@ -35,4 +47,5 @@
 
 
 </div>
-</div>
+</body>
+</html>
