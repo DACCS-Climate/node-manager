@@ -33,8 +33,8 @@ def main(global_config, **settings):
     # Add a route / path called node_register at /node/register
     config.add_route("node_register", "/node/register")
 
-    # Add a route / path for the particular node {nodeid} at /node/info/{nodeid}
-    config.add_route("node_info", "/node/info/{nodeid}")
+    # Add a route / path for the particular node {node_id} at /node/info/{node_id}
+    config.add_route("node_info", "/node/info/{node_id}")
 
     config.add_static_view('deform_static', 'deform:static/')
 
