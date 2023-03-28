@@ -4,7 +4,7 @@ import datetime
 import transaction
 import requests
 
-from sqlalchemy import engine_from_config
+from sqlalchemy import engine_from_config, inspect
 
 from pyramid.paster import (
     get_appsettings,
@@ -22,7 +22,7 @@ from .models import (
     )
 
 
-from database.node_registry import NodeRegistry
+from .node_registry import NodeRegistry
 
 
 
@@ -40,8 +40,19 @@ def usage(argv):
 
 
 
+def table_exists(engine,name):
+    inspector = inspect(engine)
+    result = inspector.dialect.has_table(engine.connect(),name)
+    # print('Table "{}" exists: {}'.format(name, ret))
+    return result
+
+
+
+
+
 
 def main(argv=sys.argv):
+    table_name = 'nodes'
     curr_dir_path = os.path.dirname(os.path.realpath(__file__))
     settings_path = os.path.join(curr_dir_path, "settings", 'settings.json')
 
@@ -49,9 +60,8 @@ def main(argv=sys.argv):
     registry.get_node_registry()
 
     github_json = registry.read_json(settings_path)
-
-
     current_date = datetime.datetime.now()
+
 
 
     if len(argv) != 2:
@@ -67,25 +77,50 @@ def main(argv=sys.argv):
 
     DBSession.configure(bind=engine)
 
-    Base.metadata.create_all(engine)
+        # Base.metadata.create_all(engine)
 
-    Node.nodes.drop(engine)
+    # Drop test database
+    # Node.__table__.drop(engine)
 
-    for key_node_name, value_url in github_json.items():
+
+    # NodeTable = DBSession.query(Node).all()
+    # for node_entry in NodeTable:
+        # print("Node Name= " + node_entry.node_name + "    Node URL= " + node_entry.url)
 
 
-        with transaction.manager:
-            # node_id='2',
-            model = Node(
-                         node_name=key_node_name,
-                         node_description='',
-                         location='',
-                         affiliation='',
-                         url=value_url,
-                         capabilities='',
-                         deploy_start_date= current_date,
-                         user_email='')
 
-            DBSession.add(model)
+    if table_exists(engine, table_name):
+        for key_node_name, value_url in github_json.items():
+
+            DBSession.query(Node).filter(Node.node_name == key_node_name).update({Node.url: value_url})
+
+            transaction.commit()
+
+            # NodeTable = DBSession.query(Node).all()
+            #f or node_entry in NodeTable:
+            #    print("Node Name= " + node_entry.node_name + "    Node URL= " + node_entry.url)
+
+    else:
+        Base.metadata.create_all(engine)
+
+        for key_node_name, value_url in github_json.items():
+            with transaction.manager:
+                # node_id='2',
+                model = Node(
+                    node_name=key_node_name,
+                    node_description='',
+                    location='',
+                    affiliation='',
+                    url=value_url,
+                    capabilities='',
+                    deploy_start_date=current_date,
+                    user_email='')
+
+                DBSession.add(model)
+
+
+
+
+
 
 
