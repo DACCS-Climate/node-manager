@@ -3,6 +3,10 @@ from setuptools import setup
 # export VENV=~/Documents/GitHub/node-manager/venv
 # $VENV/bin/pip install -e .
 # $VENV/bin/pip install -e ".[dev]"
+# $VENV/bin/initialize_db development.ini
+# $VENV/bin/pserve development.ini --reload
+
+
 
 # List of dependencies installed via `pip install -e .`
 # by virtue of the Setuptools `install_requires` value below.
