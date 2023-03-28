@@ -2,6 +2,7 @@ import os
 import sys
 import datetime
 import transaction
+import requests
 
 from sqlalchemy import engine_from_config
 
@@ -21,6 +22,11 @@ from .models import (
     )
 
 
+from database.node_registry import NodeRegistry
+
+
+
+# $VENV/bin/initialize_db development.ini
 def usage(argv):
 
     cmd = os.path.basename(argv[0])
@@ -32,15 +38,27 @@ def usage(argv):
     sys.exit(1)
 
 
+
+
+
 def main(argv=sys.argv):
+    curr_dir_path = os.path.dirname(os.path.realpath(__file__))
+    settings_path = os.path.join(curr_dir_path, "settings", 'settings.json')
+
+    registry = NodeRegistry()
+    registry.get_node_registry()
+
+    github_json = registry.read_json(settings_path)
+
+
     current_date = datetime.datetime.now()
+
 
     if len(argv) != 2:
 
         usage(argv)
 
     config_uri = argv[1]
-
     setup_logging(config_uri)
 
     settings = get_appsettings(config_uri)
@@ -51,18 +69,23 @@ def main(argv=sys.argv):
 
     Base.metadata.create_all(engine)
 
-    with transaction.manager:
+    Node.nodes.drop(engine)
 
-         model = Node(node_id='2',
-                     node_name='Node Test 2',
-                     node_description='<p>Test Node</p>',
-                     location='University of Toronto',
-                     affiliation='DACCS',
-                     url='http://www.test.com',
-                     capabilities='weaver, catalog',
-                     deploy_start_date= current_date,
-                     user_email='test@test.com')
+    for key_node_name, value_url in github_json.items():
 
-        # model = Page(title='Root', body='<p>Root</p>')
 
-        DBSession.add(model)
+        with transaction.manager:
+            # node_id='2',
+            model = Node(
+                         node_name=key_node_name,
+                         node_description='',
+                         location='',
+                         affiliation='',
+                         url=value_url,
+                         capabilities='',
+                         deploy_start_date= current_date,
+                         user_email='')
+
+            DBSession.add(model)
+
+
