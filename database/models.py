@@ -44,7 +44,7 @@ class Node(Base):
 
     __tablename__ = 'nodes'
 
-    node_id = Column(Integer, primary_key=True)
+    node_id = Column(Integer, primary_key=True, autoincrement=True)
 
     node_name = Column(Text, unique=True)
     node_description = Column(Text)
