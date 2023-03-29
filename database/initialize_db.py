@@ -43,7 +43,7 @@ def usage(argv):
 def table_exists(engine,name):
     inspector = inspect(engine)
     result = inspector.dialect.has_table(engine.connect(),name)
-    # print('Table "{}" exists: {}'.format(name, ret))
+
     return result
 
 
@@ -77,7 +77,7 @@ def main(argv=sys.argv):
 
     DBSession.configure(bind=engine)
 
-        # Base.metadata.create_all(engine)
+
 
     # Drop test database
     # Node.__table__.drop(engine)
@@ -90,6 +90,7 @@ def main(argv=sys.argv):
 
 
     if table_exists(engine, table_name):
+        # if 'nodes' table exists, update the url entry for each node name
         for key_node_name, value_url in github_json.items():
 
             DBSession.query(Node).filter(Node.node_name == key_node_name).update({Node.url: value_url})
@@ -97,15 +98,16 @@ def main(argv=sys.argv):
             transaction.commit()
 
             # NodeTable = DBSession.query(Node).all()
-            #f or node_entry in NodeTable:
+            # for node_entry in NodeTable:
             #    print("Node Name= " + node_entry.node_name + "    Node URL= " + node_entry.url)
 
     else:
+        # If the 'nodes' table does not exist, create it  and add the items in the github node_registry
         Base.metadata.create_all(engine)
 
         for key_node_name, value_url in github_json.items():
             with transaction.manager:
-                # node_id='2',
+
                 model = Node(
                     node_name=key_node_name,
                     node_description='',
