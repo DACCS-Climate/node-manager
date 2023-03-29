@@ -1,3 +1,4 @@
+import json
 import colander
 import deform.widget
 
@@ -9,18 +10,22 @@ from .models import DBSession, Node
 # Page
 
 
-class NodePage(colander.MappingSchema):
+class NodeForm(colander.MappingSchema):
+    # Used for Node Register form
 
-    title = colander.SchemaNode(colander.String())
-    # pagenodeid = colander.SchemaNode(colander.Integer())
-    node_id = colander.SchemaNode(colander.Integer())
-    nodename = colander.SchemaNode(colander.String())
-    useremail = colander.SchemaNode(colander.String())
-    nodeuse1 = colander.SchemaNode(colander.String())
-    nodeuse2 = colander.SchemaNode(colander.String())
-    nodeuse3 = colander.SchemaNode(colander.String())
+    checkbox_choices = (
+        ("weaver", "Weaver"),
+        ("catalog", "Catalog"),
+        ("jupyter", "Jupyter Notebook"),
+    )
 
-    body = colander.SchemaNode( colander.String(), widget=deform.widget.RichTextWidget())
+    node_name = colander.SchemaNode(colander.String())
+    node_url = colander.SchemaNode(colander.String())
+    user_email = colander.SchemaNode(colander.String())
+    node_use = colander.SchemaNode(colander.Set(), widget=deform.widget.CheckboxChoiceWidget(values=checkbox_choices))
+
+
+    # body = colander.SchemaNode( colander.String(), widget=deform.widget.RichTextWidget())
 
 
 class NodeViews:
@@ -32,8 +37,9 @@ class NodeViews:
     @property
     def node_form(self):
 
-        schema = NodePage()
+        schema = NodeForm()
 
+        # NOTE: default method used is POST
         return deform.Form(schema, buttons=('submit',))
 
     @property
@@ -55,8 +61,8 @@ class NodeViews:
 
         for node_contents in db_contents:
             node_row = vars(node_contents)
-            if node_row['url'] is not None:
-                print("Node ID is: " + str(node_row['node_id']) + "     URL is: " + node_row['url'])
+            # if node_row['url'] is not None:
+            #     print("Node ID is: " + str(node_row['node_id']) + "     URL is: " + node_row['url'])
 
         return dict(page_title='All Nodes',  db_node=db_contents)
 
@@ -81,26 +87,29 @@ class NodeViews:
 
             # Add a new node to the database
 
-            # new_nodeid = appstruct['node_id']
-            nodename = appstruct['nodename']
 
-            useremail = appstruct['useremail']
-            nodeuse = appstruct['nodeuse1'] + "," + appstruct['nodeuse2'] + "," + appstruct['nodeuse3']
-            nodeaffiliation = appstruct['nodeaffiliation']
+            checkboxes = appstruct['node_use']
+            nodeuse_string = ','.join(checkboxes)
+
+
+            nodename = appstruct['node_name']
+            nodeurl = appstruct['node_url']
+            useremail = appstruct['user_email']
+            nodeuse = nodeuse_string
+
+            #nodeaffiliation = appstruct['nodeaffiliation']
 
             DBSession.add(Node(node_name=nodename,
+                               url=nodeurl,
                                user_email=useremail,
-                               affiliation=nodeaffiliation,
                                capabilities=nodeuse))
 
-            # Get the new ID and redirect
+            # Get the newly added node and redirect to node_info page
 
             # page = DBSession.query(Node)
             page = DBSession.query(Node).filter_by(node_name=nodename).one()
 
             requested_node_id = page.node_id
-
-
 
             url = self.request.route_url('node_info', node_id=requested_node_id)
 
@@ -110,13 +119,25 @@ class NodeViews:
 
     @view_config(route_name='node_info', renderer='templates/node_info.pt')
     def node_info_view(self):
+        node_info_dict = {}
 
         requested_node_id = int(self.request.matchdict['node_id'])
         # db_info = DBSession.query(Node).order_by(Node.node_id)
 
         node_page = DBSession.query(Node).filter_by(node_id=requested_node_id).one()
-        # , node_id=node_page.node_id
-        return dict(node_details=node_page)
+
+        node_info_dict['node_name'] = node_page.node_name
+        node_info_dict['node_url'] = node_page.url
+
+        node_info_json = json.dumps(node_info_dict)
+        print("Node name= " + node_page.node_name)
+        print("Node use= " + node_page.capabilities)
+        print("Node json= " + node_info_json)
+
+
+
+
+        return dict(node_details = node_page, node_json = node_info_json)
 
 
 
