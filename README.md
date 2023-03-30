@@ -5,6 +5,7 @@ Web app for node manager
 
 FastAPI - [https://fastapi.tiangolo.com/](https://fastapi.tiangolo.com/)
 
+<<<<<<< Updated upstream
 # Development
 
 ## Style Checking
@@ -20,3 +21,31 @@ pre-commit install      # Install the pre-commit hooks defined in .pre-commit-co
 ```
 
 Now whenever you make a commit, the style checks will run automatically and suggest changes to your code!
+=======
+# Running the App
+
+Some things need to be done first before starting the app.
+
+
+## Set Virtual Environment
+
+If needed, set the environment variable.  Change the path as needed, but keep the last folder as 'venv'
+
+> export VENV=~/Documents/GitHub/node-manager/venv
+
+## Install Dependencies
+
+Run after setting environment variable
+
+> $VENV/bin/pip install -e .
+>
+> $VENV/bin/pip install -e ".[dev]"
+
+## Initialize the Database
+
+> $VENV/bin/initialize_db development.ini
+
+## Start the App
+
+> $VENV/bin/pserve development.ini --reload
+>>>>>>> Stashed changes
