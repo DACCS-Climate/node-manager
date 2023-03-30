@@ -68,6 +68,7 @@ class NodeViews:
     def node_register_add(self):
 
         form = self.node_form.render()
+
         # Only checks POST method data for form data
         if "submit" in self.request.POST:
 

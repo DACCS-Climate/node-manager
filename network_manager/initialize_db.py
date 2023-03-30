@@ -2,6 +2,7 @@ import os
 import sys
 import datetime
 import transaction
+from .node_registry import NodeRegistry
 
 # import psycopg2
 
@@ -18,8 +19,6 @@ from .models import (
     Node,
     Base,
 )
-
-from .node_registry import NodeRegistry
 
 
 def usage(argv):
@@ -53,6 +52,7 @@ def main(argv=sys.argv):
     config_uri = argv[1]
     setup_logging(config_uri)
     settings = get_appsettings(config_uri)
+
     engine = engine_from_config(settings, "sqlalchemy.")
 
     DBSession.configure(bind=engine)

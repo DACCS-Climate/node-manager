@@ -8,7 +8,6 @@
 /VENV/*
 /network_manager/__pycache__/*
 
-
 # Alembic files
 /network_manager/alembic/*
 

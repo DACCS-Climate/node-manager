@@ -13,6 +13,7 @@ class NodeRegistry:
         return json_content
 
     def write_json(self, path, data):
+
         with open(path, "w") as f:
             json.dump(data, f, indent=4)
 
@@ -26,8 +27,6 @@ class NodeRegistry:
         node_registry_url = app_settings["node_registry_url"]
         node_registry_file = requests.get(node_registry_url, allow_redirects=True)
         node_registry_json = json.loads(node_registry_file.text)
-
-        # self.write_json(settings_path, node_registry_json)
 
         return node_registry_json
 
