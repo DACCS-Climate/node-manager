@@ -9,20 +9,18 @@ from .models import DBSession, Base, Node
 
 def main(global_config, **settings):
 
-    engine = engine_from_config(settings, 'sqlalchemy.')
+    engine = engine_from_config(settings, "sqlalchemy.")
 
     DBSession.configure(bind=engine)
 
     Base.metadata.bind = engine
 
-    config = Configurator(settings=settings, root_factory='.models.Root')
+    config = Configurator(settings=settings, root_factory=".models.Root")
 
-    config.include('pyramid_chameleon')
-
+    config.include("pyramid_chameleon")
 
     # Add a route / path called node_home at /node
     # config.add_route("home", "/")
-
 
     # Add a route / path called node_home at /node
     config.add_route("node_home", "/node")
@@ -36,10 +34,8 @@ def main(global_config, **settings):
     # Add a route / path for the particular node {node_id} at /node/info/{node_id}
     config.add_route("node_info", "/node/info/{node_id}")
 
-    config.add_static_view('deform_static', 'deform:static/')
+    config.add_static_view("deform_static", "deform:static/")
 
-    config.scan('.views')
-
-
+    config.scan(".views")
 
     return config.make_wsgi_app()
