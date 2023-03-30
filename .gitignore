@@ -1,7 +1,17 @@
+# Mac system files
 .DS_Store
-/database/home/tests.py
-/VENV/*
+
+# Pycharm system files
 .idea/*
-/database.egg-info/*
-/database/__pycache__/*
+
+# Python files
+/VENV/*
+/network_manager/__pycache__/*
+
+
+# Alembic files
+/network_manager/alembic/*
+
+# App system files
+/network_manager.egg-info/*
 sqltutorial.sqlite

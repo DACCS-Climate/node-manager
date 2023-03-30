@@ -9,7 +9,7 @@ ENV FLASK_RUN_HOST=0.0.0.0
 # Install gcc and other dependencies
 RUN apk add --no-cache gcc musl-dev linux-headers
 # All dependencies are listed in the requirements.txt file
-COPY requirements.txt requirements.txt 
+COPY requirements.txt requirements.txt
 # pip install is run on the entire requirements list at startup of the Docker image
 RUN pip install -r requirements.txt
 # Set or 'open' port 5000 for the container to listen on

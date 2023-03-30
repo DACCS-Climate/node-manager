@@ -2,30 +2,25 @@
 <html lang="en">
 <head>
 <!-- This HTML template will be used by the Chameleon templater to pass the name variables set in views.py-->
-    <title>Node Info</title>
+    <title>${page_title}</title>
 </head>
 <body>
-<h1 >Node Info</h1>
+<h1>${page_title}</h1>
 <a href="${request.route_url('node_home')}">Node Home</a>
-<br>
-<a href="${request.route_url('node_admin')}">Node Admin</a>
-<br>
-<a href="${request.route_url('node_info', node_id=node_details.node_id)}">Node Info</a>
+
 
 <br>
 <a href="${request.route_url('node_register')}">Node Register</a>
 
 
+<h1>All Nodes</h1>
 
-<p>
-${node_json}
-${node_details.node_name}
-<br>
-${node_details.url}
+    <ul>
+        <li tal:repeat = "page db_node" >
+            <a href="node/info/${page.node_id}">${page.node_name}</a>
+        </li>
 
+    </ul>
 
-
-
-</p>
 </body>
 </html>
