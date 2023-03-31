@@ -5,7 +5,6 @@ Web app for node manager
 
 FastAPI - [https://fastapi.tiangolo.com/](https://fastapi.tiangolo.com/)
 
-<<<<<<< Updated upstream
 # Development
 
 ## Style Checking
@@ -48,4 +47,7 @@ Run after setting environment variable
 ## Start the App
 
 > $VENV/bin/pserve development.ini --reload
->>>>>>> Stashed changes
+
+## View the App
+
+In a browser go to `http://localhost:6543/node`
