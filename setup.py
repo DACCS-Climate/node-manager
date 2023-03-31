@@ -17,6 +17,7 @@ requires = [
     "pyramid",
     "pyramid_chameleon",
     "pyramid_tm",
+    "cornice",
     "sqlalchemy",
     "waitress",
     "zope.sqlalchemy",
