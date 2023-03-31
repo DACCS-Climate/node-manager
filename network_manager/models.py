@@ -1,6 +1,7 @@
 from pyramid.authorization import Allow, Everyone
 from sqlalchemy.ext.declarative import declarative_base
 from zope.sqlalchemy import register
+
 from sqlalchemy import (
     Column,
     Integer,
