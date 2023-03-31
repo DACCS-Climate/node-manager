@@ -5,8 +5,7 @@ import json
 
 class NodeRegistry:
     def read_json(self, path):
-        # project_root = "node_manager"
-        # settings_path = os.path.join(project_root, 'settings.json')
+
         with open(path, "r") as f:
             json_content = json.load(f)
 
@@ -17,6 +16,7 @@ class NodeRegistry:
         with open(path, "w") as f:
             json.dump(data, f, indent=4)
 
+    # Gets node_registry.json from github and returns the content
     def get_node_registry(self):
 
         curr_dir_path = os.path.dirname(os.path.realpath(__file__))
