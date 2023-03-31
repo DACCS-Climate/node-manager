@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-# Creat an instance of the class FastAPI
+# Create an instance of the class FastAPI
 # This will be the same instance referenced by uvicorn in the command "uvicorn main:app --reload"
 app = FastAPI()
 
