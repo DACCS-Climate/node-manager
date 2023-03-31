@@ -1,12 +1,16 @@
 import json
+
 import colander
 import deform.widget
+
 
 # from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 from cornice import Service
 
 from .models import DBSession, Node
+
+# from .templates.node_form import NodeForm
 
 
 # Used for Node Register form
@@ -27,6 +31,7 @@ class NodeForm(colander.MappingSchema):
 
 
 class NodeViews:
+
     # node_home = Service(name='node_home',
     #                     path='/node',
     #                     description='Get and display information about node in json.')
@@ -35,7 +40,7 @@ class NodeViews:
         name="node_info", path="/node/info/{node_id}", description="Get and display information about node in json."
     )
 
-    node_register = Service(name="node_register", path="/node/register", description="Add node info to database.")
+    # node_register = Service(name="node_register", path="/node/register", description="Add node info to database.")
 
     _NODEINFO = {}
 
@@ -125,18 +130,52 @@ class NodeViews:
 
         return dict(page_title="All Nodes", db_node=db_contents)
 
+    # @node_register.get()
     # @view_config(route_name="node_register", renderer="templates/node_register.pt")
-    @node_register.post()
-    def node_register_add(self):
+    def node_register_view(self):
 
-        form = self.node_form.render()
+        schema = NodeForm()
+
+        # NOTE: default method used is POST
+        node_form = deform.Form(schema, buttons=("submit",))
+        # node_form = NodeForm()
+        form = node_form.render()
 
         # Only checks POST method data for form data
-        if "submit" in self:
+        if "submit" in self.POST:
 
-            controls = self.items()
-            print("Controls=")
-            print(controls)
+            controls = self.POST.items()
+
+            try:
+
+                appstruct = self.node_form.validate(controls)
+                print(appstruct)
+
+            except deform.ValidationFailure as e:
+
+                # Form is NOT valid
+
+                return dict(form=e.render())
+
+        return dict(form=form)
+
+    # @node_register.post()
+    @view_config(route_name="node_register", renderer="templates/node_register.pt")
+    def node_register_add(self):
+
+        # chema = NodeForm()
+
+        # NOTE: default method used is POST
+        # node_form = deform.Form(schema, buttons=("submit",))
+        # node_form = NodeForm()
+        form = self.node_form.render()
+
+        # form = self.node_form.render()
+
+        # Only checks POST method data for form data
+        if "submit" in self.request.POST:
+
+            controls = self.request.POST.items()
 
             try:
 

@@ -18,13 +18,13 @@ def main(global_config, **settings):
 
     # Add a route / path called node_register at /node/register.
     # This is the 'admin' page where an entry can be added to the database
-    # config.add_route("node_register", "/node/register", request_method="GET")
+    config.add_route("node_register", "/node/register", request_method="GET")
 
     # Add a route / path for the particular node {node_id} at /node/info/{node_id}
     # Returns details about a particular node in json format
     # config.add_route("node_info", "/node/info/{node_id}", request_method="GET")
 
-    # config.add_static_view("deform_static", "deform:static/")
+    config.add_static_view("deform_static", "deform:static/")
 
     config.scan(".views")
 
