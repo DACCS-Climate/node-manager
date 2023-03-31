@@ -3,10 +3,10 @@ import sys
 import datetime
 import transaction
 from .node_registry import NodeRegistry
+from sqlalchemy import engine_from_config, inspect
 
 # import psycopg2
 
-from sqlalchemy import engine_from_config, inspect
 
 from pyramid.paster import (
     get_appsettings,
