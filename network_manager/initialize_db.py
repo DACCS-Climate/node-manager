@@ -37,6 +37,16 @@ def table_exists(engine, name):
     return result
 
 
+def drop_table():
+    argv = sys.argv
+    config_uri = argv[1]
+    settings = get_appsettings(config_uri)
+    engine = engine_from_config(settings, "sqlalchemy.")
+
+    # Drop test database
+    Node.__table__.drop(engine)
+
+
 def main(argv=sys.argv):
     table_name = "nodes"
 
@@ -57,13 +67,6 @@ def main(argv=sys.argv):
 
     DBSession.configure(bind=engine)
 
-    # Drop test database
-    # Node.__table__.drop(engine)
-
-    # NodeTable = DBSession.query(Node).all()
-    # for node_entry in NodeTable:
-    # print("Node Name= " + node_entry.node_name + "    Node URL= " + node_entry.url)
-
     if table_exists(engine, table_name):
         # if 'nodes' table exists, update the url entry for each node name
         for key_node_name, value_url in github_json.items():
@@ -71,10 +74,6 @@ def main(argv=sys.argv):
             DBSession.query(Node).filter(Node.node_name == key_node_name).update({Node.url: value_url})
 
             transaction.commit()
-
-            # NodeTable = DBSession.query(Node).all()
-            # for node_entry in NodeTable:
-            #    print("Node Name= " + node_entry.node_name + "    Node URL= " + node_entry.url)
 
     else:
         # If the 'nodes' table does not exist, create it  and add the items in the github node_registry
