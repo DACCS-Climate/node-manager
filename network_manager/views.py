@@ -93,7 +93,7 @@ class NodeViews:
             url = self.request.route_url("node_added", new_node_id=new_node_id)
             return HTTPFound(url)
 
-        return dict(form=form)
+        return dict(page_title="Node Register", form=form)
 
     @view_config(route_name="node_added", renderer="templates/node_added_view.pt")
     def node_added_view(self):
@@ -102,7 +102,7 @@ class NodeViews:
 
         new_node_entry = DBSession.query(Node).filter_by(node_id=new_node_id).one()
 
-        return dict(new_node=new_node_entry)
+        return dict(page_title="Node Register", new_node=new_node_entry)
 
     @node_info.get()
     def node_info_view(self):
