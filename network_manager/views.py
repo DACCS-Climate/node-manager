@@ -1,16 +1,12 @@
 import json
-
 import colander
 import deform.widget
 
-
-# from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 from cornice import Service
 
 from .models import DBSession, Node
-
-# from .templates.node_form import NodeForm
 
 
 # Used for Node Register form
@@ -27,82 +23,13 @@ class NodeForm(colander.MappingSchema):
     user_email = colander.SchemaNode(colander.String())
     node_use = colander.SchemaNode(colander.Set(), widget=deform.widget.CheckboxChoiceWidget(values=checkbox_choices))
 
-    # body = colander.SchemaNode( colander.String(), widget=deform.widget.RichTextWidget())
-
 
 class NodeViews:
 
-    # node_home = Service(name='node_home',
-    #                     path='/node',
-    #                     description='Get and display information about node in json.')
-
+    # Set API for information about a single node
     node_info = Service(
         name="node_info", path="/node/info/{node_id}", description="Get and display information about node in json."
     )
-
-    # node_register = Service(name="node_register", path="/node/register", description="Add node info to database.")
-
-    _NODEINFO = {}
-
-    # @node_info.get()
-    # def get_node_info(self, request):
-    #     print("node Info keys = ")
-    #     print(_NODEINFO.keys())
-    #     node_info_dict = {}
-
-    #     requested_node_id = int(self.request.matchdict["node_id"])
-    #     node_page = DBSession.query(Node).filter_by(node_id=requested_node_id).one()
-
-    # node_info_dict["node_name"] = node_page.node_name
-    # node_info_dict["node_url"] = node_page.url
-
-    #     node_info_dict["node_name"] = node_page.node_name
-    #     node_info_dict["node_url"] = node_page.url
-
-    # node_info_json = json.dumps(node_info_dict)
-    #     _NODEINFO = json.dumps(node_info_dict)
-
-    #     return _NODEINFO
-
-    # @node_register.post()
-    # def register_node_info(self):
-    # form = self.node_form.render()
-
-    # Only checks POST method data for form data
-    # if "submit" in self.request.POST:
-
-    #     controls = self.request.POST.items()
-
-    #     try:
-
-    #         appstruct = self.node_form.validate(controls)
-
-    #     except deform.ValidationFailure as e:
-
-    # Form is NOT valid
-
-    #         return dict(form=e.render())
-
-    # Add a new entry of node information to the database
-    #     checkboxes = appstruct["node_use"]
-    #     nodeuse_string = ",".join(checkboxes)
-
-    #     nodename = appstruct["node_name"]
-    #     nodeurl = appstruct["node_url"]
-    #     useremail = appstruct["user_email"]
-    #     nodeuse = nodeuse_string
-
-    #     DBSession.add(Node(node_name=nodename, url=nodeurl, user_email=useremail, capabilities=nodeuse))
-    # Get the newly added node information and redirect to node_info page
-    #     page = DBSession.query(Node).filter_by(node_name=nodename).one()
-
-    #     requested_node_id = page.node_id
-
-    #     url = self.request.route_url("node_info", node_id=requested_node_id)
-
-    #     return HTTPFound(url)
-
-    # return dict(form=form)
 
     def __init__(self, request):
 
@@ -113,7 +40,7 @@ class NodeViews:
 
         schema = NodeForm()
 
-        # NOTE: default method used is POST
+        # NOTE: default method used is POST for form submit
         return deform.Form(schema, buttons=("submit",))
 
     @property
@@ -121,8 +48,6 @@ class NodeViews:
 
         return self.node_form.get_widget_resources()
 
-    # @view_config(route_name="node_home", renderer="templates/node_home.pt")
-    # @node_home.get()
     @view_config(route_name="node_home", renderer="templates/node_home.pt")
     def node_home(self):
 
@@ -130,50 +55,14 @@ class NodeViews:
 
         return dict(page_title="All Nodes", db_node=db_contents)
 
-    # @node_register.get()
-    # @view_config(route_name="node_register", renderer="templates/node_register.pt")
-    def node_register_view(self):
-
-        schema = NodeForm()
-
-        # NOTE: default method used is POST
-        node_form = deform.Form(schema, buttons=("submit",))
-        # node_form = NodeForm()
-        form = node_form.render()
-
-        # Only checks POST method data for form data
-        if "submit" in self.POST:
-
-            controls = self.POST.items()
-
-            try:
-
-                appstruct = self.node_form.validate(controls)
-                print(appstruct)
-
-            except deform.ValidationFailure as e:
-
-                # Form is NOT valid
-
-                return dict(form=e.render())
-
-        return dict(form=form)
-
-    # @node_register.post()
     @view_config(route_name="node_register", renderer="templates/node_register.pt")
-    def node_register_add(self):
+    def node_register(self):
 
-        # chema = NodeForm()
-
-        # NOTE: default method used is POST
-        # node_form = deform.Form(schema, buttons=("submit",))
-        # node_form = NodeForm()
         form = self.node_form.render()
 
-        # form = self.node_form.render()
-
-        # Only checks POST method data for form data
-        if "submit" in self.request.POST:
+        # Checks for the submit button, then uses POST to get the submitted information
+        # If not, display form using GET
+        if "submit" in self.request.params:
 
             controls = self.request.POST.items()
 
@@ -198,16 +87,23 @@ class NodeViews:
 
             DBSession.add(Node(node_name=nodename, url=nodeurl, user_email=useremail, capabilities=nodeuse))
 
-            # Get the newly added node information and redirect to node_info page
-
-            # page = DBSession.query(Node).filter_by(node_name=nodename).one()
-            # requested_node_id = page.node_id
-            # url = self.route_url("node_info", node_id=requested_node_id)
-            # return HTTPFound(url)
+            # Get the newly added node information and redirect to Node Added Successfully page
+            new_added_node = DBSession.query(Node).filter_by(node_name=nodename).one()
+            new_node_id = new_added_node.node_id
+            url = self.request.route_url("node_added", new_node_id=new_node_id)
+            return HTTPFound(url)
 
         return dict(form=form)
 
-    # @view_config(route_name="node_info", renderer="templates/node_info.pt")
+    @view_config(route_name="node_added", renderer="templates/node_added_view.pt")
+    def node_added_view(self):
+
+        new_node_id = int(self.request.matchdict["new_node_id"])
+
+        new_node_entry = DBSession.query(Node).filter_by(node_id=new_node_id).one()
+
+        return dict(new_node=new_node_entry)
+
     @node_info.get()
     def node_info_view(self):
 
