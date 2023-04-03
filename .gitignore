@@ -3,6 +3,7 @@
 
 # Pycharm system files
 .idea/*
+/tests/__pycache__/*
 
 # Python files
 /VENV/*
