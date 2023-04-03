@@ -1,5 +1,5 @@
 # node-manager
-Web app for node manager 
+Web app for node manager
 
 # Requirements
 
