@@ -21,7 +21,7 @@ def main(global_config, **settings):
     config.add_route("node_register", "/node/register")
 
     # Add a route / path called node_added at /node/added.
-    # This shows the newly added info
+    # This shows the newly added info to the database
     config.add_route("node_added", "/node/added/{new_node_id}")
 
     config.add_static_view("deform_static", "deform:static/")
