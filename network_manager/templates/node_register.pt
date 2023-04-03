@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Node Register</title>
+    <title>Node Added Successfully</title>
     <link rel="stylesheet"
           href="${request.static_url('deform:static/css/bootstrap.min.css')}"
           type="text/css" media="screen" charset="utf-8"/>
@@ -23,7 +23,7 @@
     </tal:block>
 </head>
 <body>
-<h1>Node Register</h1>
+<h1>${page_title}</h1>
 <a href="${request.route_url('node_home')}">Node Home</a>
 
 
