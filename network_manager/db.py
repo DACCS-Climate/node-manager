@@ -3,7 +3,7 @@ import sys
 import datetime
 import transaction
 from sqlalchemy import engine_from_config, insert, inspect
-from .node_registry import NodeRegistry
+from .node_update import NodeRegistry
 from pyramid.paster import (
     get_appsettings,
 )
