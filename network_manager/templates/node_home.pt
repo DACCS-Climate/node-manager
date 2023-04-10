@@ -15,8 +15,11 @@
     <ul>
         <li tal:repeat = "page db_node" >
             ${page.node_name}
-            <a href="node/info/${page.node_id}">View</a>
-            <a href="node/register/${page.node_id}">Edit</a>
+
+             <a href="${request.route_url('node_info', node_id=page.node_id)}">View</a>
+             <a href="${request.route_url('node_update', node_id=page.node_id)}">Edit</a>
+
+
         </li>
 
     </ul>
