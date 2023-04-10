@@ -19,8 +19,8 @@ def main(global_config, **settings):
     # "Get and display information about node in json."
     config.add_route("node_info", "/node/info/{node_id}")
 
-    # Add a route / path called node_register at /node/register.
-    # This is the 'admin' page where an entry can be added to the database
+    # Add a route / path called node_update at /node/update.
+    # This is the 'admin' page where an entry can be updated in the database
     config.add_route("node_update", "/node/update/{node_id}")
 
     # Add a route / path called node_added at /node/added.
