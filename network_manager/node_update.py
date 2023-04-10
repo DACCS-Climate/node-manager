@@ -16,13 +16,18 @@ class NodeRegistry:
         with open(path, "w") as f:
             json.dump(data, f, indent=4)
 
-    # Gets node_registry.json from github and returns the content
-    def get_node_registry(self):
-
+    # Get project specific settings
+    def get_settings(self):
         curr_dir_path = os.path.dirname(os.path.realpath(__file__))
         app_settings_path = os.path.join(curr_dir_path, "settings", "app_settings.json")
 
         app_settings = self.read_json(app_settings_path)
+        return app_settings
+
+    # Gets node_registry.json from github and returns the content
+    def get_node_registry(self):
+
+        app_settings = self.get_settings()
 
         node_registry_url = app_settings["node_registry_url"]
         node_registry_file = requests.get(node_registry_url, allow_redirects=True)
