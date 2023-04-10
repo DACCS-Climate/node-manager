@@ -9,9 +9,6 @@
 /VENV/*
 /network_manager/__pycache__/*
 
-# Alembic files
-/network_manager/alembic/*
-
 # App system files
 /network_manager.egg-info/*
 sqltutorial.sqlite
