@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Node Added Successfully</title>
+
     <link rel="stylesheet"
           href="${request.static_url('deform:static/css/bootstrap.min.css')}"
           type="text/css" media="screen" charset="utf-8"/>
@@ -27,8 +27,7 @@
 <a href="${request.route_url('node_home')}">Node Home</a>
 
 
-<br>
-<a href="${request.route_url('node_register')}">Node Register</a>
+
 
 <p>${structure: form}</p>
 <script type="text/javascript">
