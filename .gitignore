@@ -5,6 +5,9 @@
 .idea/*
 /tests/__pycache__/*
 
+# Alembic files
+/network_manager/alembic/__pycache__/*
+
 # Python files
 /VENV/*
 /network_manager/__pycache__/*
