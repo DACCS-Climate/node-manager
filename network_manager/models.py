@@ -4,6 +4,7 @@ from zope.sqlalchemy import register
 
 from sqlalchemy import (
     Column,
+    Boolean,
     Integer,
     Text,
     DateTime,
@@ -33,10 +34,11 @@ class Node(Base):
     location = Column(Text)
     affiliation = Column(Text)
     url = Column(Text, unique=True)
-    capabilities = Column(Text)
+    weaver = Column(Boolean, default=False)
+    jupyter = Column(Boolean, default=False)
+    catalog = Column(Boolean, default=False)
     deploy_start_date = Column(DateTime)
     user_email = Column(Text)
-    # body = Column(Text)
 
 
 class Root:
