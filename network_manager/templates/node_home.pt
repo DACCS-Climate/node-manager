@@ -7,15 +7,16 @@
 <body>
 <h1>${page_title}</h1>
 <a href="${request.route_url('node_home')}">Node Home</a>
-<br>
-<a href="${request.route_url('node_register')}">Node Register</a>
+
 
 
 <h1>All Nodes</h1>
 
     <ul>
         <li tal:repeat = "page db_node" >
-            <a href="node/info/${page.node_id}">${page.node_name}</a>
+            ${page.node_name}
+            <a href="node/info/${page.node_id}">View</a>
+            <a href="node/register/${page.node_id}">Edit</a>
         </li>
 
     </ul>
