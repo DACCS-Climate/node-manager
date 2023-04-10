@@ -21,7 +21,7 @@ def main(global_config, **settings):
 
     # Add a route / path called node_register at /node/register.
     # This is the 'admin' page where an entry can be added to the database
-    config.add_route("node_register", "/node/register/{node_id}")
+    config.add_route("node_update", "/node/update/{node_id}")
 
     # Add a route / path called node_added at /node/added.
     # This shows the newly added info to the database
