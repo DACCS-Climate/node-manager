@@ -16,9 +16,12 @@ def main(global_config, **settings):
     # Add a route / path called node_home at /node for displaying all entries in the database
     config.add_route("node_home", "/node")
 
+    # "Get and display information about node in json."
+    config.add_route("node_info", "/node/info/{node_id}")
+
     # Add a route / path called node_register at /node/register.
     # This is the 'admin' page where an entry can be added to the database
-    config.add_route("node_register", "/node/register")
+    config.add_route("node_register", "/node/register/{node_id}")
 
     # Add a route / path called node_added at /node/added.
     # This shows the newly added info to the database
