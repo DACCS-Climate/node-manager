@@ -34,6 +34,5 @@ setup(
     },
     entry_points={
         "paste.app_factory": ["main = network_manager:main"],
-        "console_scripts": ["initialize_db = network_manager.initialize_db:main"],
     },
 )
