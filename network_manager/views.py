@@ -1,42 +1,50 @@
 import json
 import colander
 import deform.widget
-
+import transaction
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
-from cornice import Service
 
 from .models import DBSession, Node
-
-
-# Used for Node Register form
-class NodeForm(colander.MappingSchema):
-
-    checkbox_choices = (
-        ("weaver", "Weaver"),
-        ("catalog", "Catalog"),
-        ("jupyter", "Jupyter Notebook"),
-    )
-
-    node_name = colander.SchemaNode(colander.String())
-    node_url = colander.SchemaNode(colander.String())
-    user_email = colander.SchemaNode(colander.String())
-    node_use = colander.SchemaNode(colander.Set(), widget=deform.widget.CheckboxChoiceWidget(values=checkbox_choices))
+from .db import DB
 
 
 class NodeViews:
-
-    # Set API for information about a single node
-    node_info = Service(
-        name="node_info", path="/node/info/{node_id}", description="Get and display information about node in json."
-    )
-
     def __init__(self, request):
 
         self.request = request
 
     @property
     def node_form(self):
+        # On page load get the passed node ID and get the node details to populate the form fields
+        requested_node_id = int(self.request.matchdict["node_id"])
+        requested_node = DBSession.query(Node).filter_by(node_id=requested_node_id).one()
+
+        # Used for Node Register form
+        class NodeForm(colander.MappingSchema):
+
+            node_name = colander.SchemaNode(colander.String(), default=requested_node.node_name)
+            node_url = colander.SchemaNode(colander.String(), default=requested_node.url)
+            user_email = colander.SchemaNode(colander.String(), default=requested_node.user_email)
+            weaver = colander.SchemaNode(
+                colander.Boolean(),
+                widget=deform.widget.CheckboxWidget(),
+                default=requested_node.weaver,
+                label="Weaver",
+                title="Capabilities",
+            )
+            catalog = colander.SchemaNode(
+                colander.Boolean(),
+                widget=deform.widget.CheckboxWidget(),
+                default=requested_node.catalog,
+                label="Catalog",
+            )
+            jupyter = colander.SchemaNode(
+                colander.Boolean(),
+                widget=deform.widget.CheckboxWidget(),
+                default=requested_node.jupyter,
+                label="Jupyter",
+            )
 
         schema = NodeForm()
 
@@ -51,12 +59,18 @@ class NodeViews:
     @view_config(route_name="node_home", renderer="templates/node_home.pt")
     def node_home(self):
 
-        db_contents = DBSession.query(Node).all()
+        db = DB()
+        db.add_github_node_registry()
+
+        db_contents = DBSession.query(Node).order_by(Node.node_id)
 
         return dict(page_title="All Nodes", db_node=db_contents)
 
-    @view_config(route_name="node_register", renderer="templates/node_register.pt")
-    def node_register(self):
+    @view_config(route_name="node_update", renderer="templates/node_update.pt")
+    def node_update(self):
+        title = "Node Update"
+
+        requested_node_id = int(self.request.matchdict["node_id"])
 
         form = self.node_form.render()
 
@@ -76,24 +90,35 @@ class NodeViews:
 
                 return dict(form=e.render())
 
-            # Add a new entry of node information to the database
-            checkboxes = appstruct["node_use"]
-            nodeuse_string = ",".join(checkboxes)
-
+            title = "Updated Successfully"
+            # Updates entry of node information to the database
             nodename = appstruct["node_name"]
             nodeurl = appstruct["node_url"]
             useremail = appstruct["user_email"]
-            nodeuse = nodeuse_string
+            weaver = appstruct["weaver"]
+            catalog = appstruct["catalog"]
+            jupyter = appstruct["jupyter"]
 
-            DBSession.add(Node(node_name=nodename, url=nodeurl, user_email=useremail, capabilities=nodeuse))
+            DBSession.query(Node).filter(Node.node_id == requested_node_id).update(
+                {
+                    Node.node_name: nodename,
+                    Node.url: nodeurl,
+                    Node.user_email: useremail,
+                    Node.weaver: weaver,
+                    Node.catalog: catalog,
+                    Node.jupyter: jupyter,
+                },
+                synchronize_session=False,
+            )
+            transaction.commit()
 
             # Get the newly added node information and redirect to Node Added Successfully page
             new_added_node = DBSession.query(Node).filter_by(node_name=nodename).one()
             new_node_id = new_added_node.node_id
-            url = self.request.route_url("node_added", new_node_id=new_node_id)
+            url = self.request.route_url("node_added", new_node_id=new_node_id, page_title=title)
             return HTTPFound(url)
 
-        return dict(page_title="Node Register", form=form)
+        return dict(page_title=title, form=form)
 
     @view_config(route_name="node_added", renderer="templates/node_added_view.pt")
     def node_added_view(self):
@@ -104,12 +129,12 @@ class NodeViews:
 
         return dict(page_title="Node Register", new_node=new_node_entry)
 
-    @node_info.get()
+    @view_config(route_name="node_info", renderer="json")
     def node_info_view(self):
 
         node_info_dict = {}
 
-        requested_node_id = int(self.matchdict["node_id"])
+        requested_node_id = int(self.request.matchdict["node_id"])
         node_page = DBSession.query(Node).filter_by(node_id=requested_node_id).one()
 
         node_info_dict["node_name"] = node_page.node_name
