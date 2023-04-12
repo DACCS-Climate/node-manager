@@ -1,5 +1,0 @@
-{
-  "node_registry_url": "https://raw.githubusercontent.com/DACCS-Climate/DACCS-node-registry/main/node_registry.json",
-  "alembic_ini_file": "../alembic.ini",
-  "postgres_db_url": "postgresql+psycopg2://postgres:localpassword@localhost:5432/noderegistry"
-}
