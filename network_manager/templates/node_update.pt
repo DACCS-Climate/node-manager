@@ -23,6 +23,7 @@
     </tal:block>
 </head>
 <body>
+<!-- <h1>Available Nodes</h1> -->
 <h1>${page_title}</h1>
 <a href="${request.route_url('node_home')}">Node Home</a>
 
