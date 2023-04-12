@@ -1,14 +1,7 @@
-import os
-import sys
 import datetime
 import transaction
-from sqlalchemy import engine_from_config, insert, inspect
-from .node_update import NodeRegistry
-from pyramid.paster import (
-    get_appsettings,
-)
-
-
+from sqlalchemy import insert
+from .node_registry import NodeRegistry
 from .models import (
     DBSession,
     Node,
@@ -16,29 +9,6 @@ from .models import (
 
 
 class DB:
-    def usage(self, argv):
-
-        cmd = os.path.basename(argv[0])
-
-        print("usage: %s <config_uri>\n" '(example: "%s development.ini")' % (cmd, cmd))
-        print(argv)
-        sys.exit(1)
-
-    def table_exists(self, engine, name):
-        inspector = inspect(engine)
-        result = inspector.dialect.has_table(engine.connect(), name)
-
-        return result
-
-    def drop_table(self):
-        argv = sys.argv
-        config_uri = argv[1]
-        settings = get_appsettings(config_uri)
-        engine = engine_from_config(settings, "sqlalchemy.")
-
-        # Drop test database
-        Node.__table__.drop(engine)
-
     def check_entry(self, requested_name):
 
         existing_entry = DBSession.query(DBSession.query(Node).filter_by(node_name=requested_name).exists()).scalar()
@@ -69,7 +39,6 @@ class DB:
 
             else:
                 # If the node name does not exist, add the items in the github node_registry
-
                 with transaction.manager:
 
                     model = Node(
@@ -78,13 +47,11 @@ class DB:
                         location="",
                         affiliation="",
                         url=value_url,
-                        capabilities="",
+                        support_contact_email="",
                         deploy_start_date=current_date,
-                        user_email="",
+                        data=None,
+                        compute=None,
+                        administrator="",
                     )
 
                     DBSession.add(model)
-
-    def initialize_db(self):
-
-        self.add_github_node_registry()
