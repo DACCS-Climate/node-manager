@@ -1,6 +1,7 @@
 import json
 import colander
 import deform.widget
+import datetime
 import transaction
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
@@ -20,30 +21,48 @@ class NodeViews:
         requested_node_id = int(self.request.matchdict["node_id"])
         requested_node = DBSession.query(Node).filter_by(node_id=requested_node_id).one()
 
-        # Used for Node Register form
+        # Used for Node Update form
+        class DateWidget(colander.Schema):
+            # min_err=_("${val} is earlier than earliest date ${min}"),
+            date_widget = colander.SchemaNode(
+                colander.Date(),
+                widget=deform.widget.DatePartsWidget(),
+                validator=colander.Range(
+                    min=datetime.date(2010, 1, 1),
+                ),
+                missing="",
+                default=requested_node.deploy_start_date,
+                label="Deployed Since",
+            )
+
+        # Used for Node Update form
         class NodeForm(colander.MappingSchema):
 
             node_name = colander.SchemaNode(colander.String(), default=requested_node.node_name)
             node_url = colander.SchemaNode(colander.String(), default=requested_node.url)
-            user_email = colander.SchemaNode(colander.String(), default=requested_node.user_email)
-            weaver = colander.SchemaNode(
+            location = colander.SchemaNode(colander.String(), missing="", default=requested_node.location)
+            affiliation = colander.SchemaNode(colander.String(), missing="", default=requested_node.affiliation)
+            administrator = colander.SchemaNode(
+                colander.String(), missing="", default=requested_node.administrator, title="Administrator"
+            )
+            deploy_start_date = DateWidget()
+            support_contact_email = colander.SchemaNode(
+                colander.String(), missing="", default=requested_node.support_contact_email
+            )
+            data = colander.SchemaNode(
                 colander.Boolean(),
                 widget=deform.widget.CheckboxWidget(),
-                default=requested_node.weaver,
-                label="Weaver",
+                missing="",
+                default=requested_node.data,
+                label="Data",
                 title="Capabilities",
             )
-            catalog = colander.SchemaNode(
+            compute = colander.SchemaNode(
                 colander.Boolean(),
                 widget=deform.widget.CheckboxWidget(),
-                default=requested_node.catalog,
-                label="Catalog",
-            )
-            jupyter = colander.SchemaNode(
-                colander.Boolean(),
-                widget=deform.widget.CheckboxWidget(),
-                default=requested_node.jupyter,
-                label="Jupyter",
+                missing="",
+                default=requested_node.compute,
+                label="Compute",
             )
 
         schema = NodeForm()
@@ -91,43 +110,41 @@ class NodeViews:
                 return dict(form=e.render())
 
             title = "Updated Successfully"
+
             # Updates entry of node information to the database
+            date_widget_data = appstruct["deploy_start_date"]
+
             nodename = appstruct["node_name"]
             nodeurl = appstruct["node_url"]
-            useremail = appstruct["user_email"]
-            weaver = appstruct["weaver"]
-            catalog = appstruct["catalog"]
-            jupyter = appstruct["jupyter"]
+            location = appstruct["location"]
+            affiliation = appstruct["affiliation"]
+            deploystartdate = date_widget_data["date_widget"]
+            supportemail = appstruct["support_contact_email"]
+            data = appstruct["data"]
+            compute = appstruct["compute"]
 
             DBSession.query(Node).filter(Node.node_id == requested_node_id).update(
                 {
                     Node.node_name: nodename,
                     Node.url: nodeurl,
-                    Node.user_email: useremail,
-                    Node.weaver: weaver,
-                    Node.catalog: catalog,
-                    Node.jupyter: jupyter,
+                    Node.support_contact_email: supportemail,
+                    Node.location: location,
+                    Node.affiliation: affiliation,
+                    Node.deploy_start_date: deploystartdate,
+                    Node.data: data,
+                    Node.compute: compute,
                 },
                 synchronize_session=False,
             )
             transaction.commit()
 
-            # Get the newly added node information and redirect to Node Added Successfully page
+            # Get the newly added node information and show it in the same form
             new_added_node = DBSession.query(Node).filter_by(node_name=nodename).one()
             new_node_id = new_added_node.node_id
-            url = self.request.route_url("node_added", new_node_id=new_node_id, page_title=title)
+            url = self.request.route_url("node_update", node_id=new_node_id, page_title=title)
             return HTTPFound(url)
 
         return dict(page_title=title, form=form)
-
-    @view_config(route_name="node_added", renderer="templates/node_added_view.pt")
-    def node_added_view(self):
-
-        new_node_id = int(self.request.matchdict["new_node_id"])
-
-        new_node_entry = DBSession.query(Node).filter_by(node_id=new_node_id).one()
-
-        return dict(page_title="Node Register", new_node=new_node_entry)
 
     @view_config(route_name="node_info", renderer="json")
     def node_info_view(self):
