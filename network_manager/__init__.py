@@ -9,8 +9,7 @@ def main(global_config, **settings):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
 
-    config = Configurator(settings=settings, root_factory=".models.Root")
-    config.include("cornice")
+    config = Configurator(settings=settings)
     config.include("pyramid_chameleon")
 
     # Add a route / path called node_home at /node for displaying all entries in the database

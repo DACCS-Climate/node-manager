@@ -1,4 +1,3 @@
-from pyramid.authorization import Allow, Everyone
 from sqlalchemy.ext.declarative import declarative_base
 from zope.sqlalchemy import register
 
@@ -38,12 +37,3 @@ class Node(Base):
     data = Column(Boolean, default=False)
     compute = Column(Boolean, default=False)
     administrator = Column(Text)
-
-
-# Root Factory
-# Used for building access control list
-class Root:
-    __acl__ = [(Allow, Everyone, "view"), (Allow, "group:editors", "edit")]
-
-    def __init__(self, request):
-        self.request = request
