@@ -22,20 +22,6 @@ class NodeViews:
         requested_node = DBSession.query(Node).filter_by(node_id=requested_node_id).one()
 
         # Used for Node Update form
-        class DateWidget(colander.Schema):
-            # min_err=_("${val} is earlier than earliest date ${min}"),
-            date_widget = colander.SchemaNode(
-                colander.Date(),
-                widget=deform.widget.DatePartsWidget(),
-                validator=colander.Range(
-                    min=datetime.date(2010, 1, 1),
-                ),
-                missing="",
-                default=requested_node.deploy_start_date,
-                label="Deployed Since",
-            )
-
-        # Used for Node Update form
         class NodeForm(colander.MappingSchema):
 
             node_name = colander.SchemaNode(colander.String(), default=requested_node.node_name)
@@ -45,7 +31,16 @@ class NodeViews:
             administrator = colander.SchemaNode(
                 colander.String(), missing="", default=requested_node.administrator, title="Administrator"
             )
-            deploy_start_date = DateWidget()
+            deployed_since = colander.SchemaNode(
+                colander.Date(),
+                widget=deform.widget.DatePartsWidget(),
+                validator=colander.Range(
+                    min=datetime.date(2010, 1, 1),
+                ),
+                missing="",
+                default=requested_node.deploy_start_date,
+                title="Deployed Since",
+            )
             support_contact_email = colander.SchemaNode(
                 colander.String(), missing="", default=requested_node.support_contact_email
             )
@@ -72,7 +67,6 @@ class NodeViews:
 
     @property
     def reqts(self):
-
         return self.node_form.get_widget_resources()
 
     @view_config(route_name="node_home", renderer="templates/node_home.pt")
@@ -112,13 +106,11 @@ class NodeViews:
             title = "Updated Successfully"
 
             # Updates entry of node information to the database
-            date_widget_data = appstruct["deploy_start_date"]
-
             nodename = appstruct["node_name"]
             nodeurl = appstruct["node_url"]
             location = appstruct["location"]
             affiliation = appstruct["affiliation"]
-            deploystartdate = date_widget_data["date_widget"]
+            deploystartdate = appstruct["deployed_since"]
             supportemail = appstruct["support_contact_email"]
             data = appstruct["data"]
             compute = appstruct["compute"]
