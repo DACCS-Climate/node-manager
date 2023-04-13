@@ -50,9 +50,9 @@ The database connection string will need to be set or changed in the following f
 
 #### development.ini
 
-Search for "DATABASE_CONNECTION_URL" and ensure it is set to "SQLITE_DATABASE_URL"
+Search for "sqlalchemy.url" and ensure it is set to "SQLITE_DATABASE_URL"
 
-> DATABASE_CONNECTION_URL = %(SQLITE_DATABASE_URL)s
+> sqlalchemy.url = %(SQLITE_DATABASE_URL)s
 
 #### alembic.ini
 
@@ -69,9 +69,9 @@ The database connection string will need to be set or changed in the following f
 
 #### development.ini
 
-Search for "DATABASE_CONNECTION_URL" and ensure it is set to "POSTGRES_DATABASE_URL"
+Search for "sqlalchemy.url" and ensure it is set to "POSTGRES_DATABASE_URL"
 
-> DATABASE_CONNECTION_URL = %(POSTGRES_DATABASE_URL)s
+> sqlalchemy.url = %(POSTGRES_DATABASE_URL)s
 
 #### alembic.ini
 
@@ -98,7 +98,11 @@ If the database and table has not been created, install Postgres, set up the dat
 
 ## Start the App
 
+### For development
 > $VENV/bin/pserve development.ini --reload
+
+### For production
+> $VENV/bin/pserve production.ini --reload
 
 ## View the App
 
