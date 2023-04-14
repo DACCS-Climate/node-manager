@@ -42,53 +42,29 @@ Run after setting environment variable
 
 ## Initialize the Database
 
-### For sqlite database (testing only)
-
-The database connection string will need to be set or changed in the following files:
- - development.ini
- - alembic.ini
-
-#### development.ini
-
-Search for "sqlalchemy.url" and ensure it is set to "SQLITE_DATABASE_URL"
-
-> sqlalchemy.url = %(SQLITE_DATABASE_URL)s
-
-#### alembic.ini
-
-Search for "Database connection strings" and ensure the one for sqlite is uncommented
-
-> sqlalchemy.url = sqlite:///%(here)s/sqltutorial.sqlite
-
-
 ### For postgres database (testing and production)
 
 The database connection string will need to be set or changed in the following files:
  - development.ini
- - alembic.ini
+ - production.ini
 
-#### development.ini
+#### development.ini and production.ini
 
 Search for "sqlalchemy.url" and ensure it is set to "POSTGRES_DATABASE_URL"
 
 > sqlalchemy.url = %(POSTGRES_DATABASE_URL)s
 
-#### alembic.ini
+#### development.ini and production.ini - alembic section
 
-Search for "Database connection strings" and ensure the one for postgres is uncommented
+Search for "Database connection strings" and ensure it is set to "POSTGRES_DATABASE_URL"
 
-> sqlalchemy.url = postgresql+psycopg2://postgres:localpassword@localhost:5432/noderegistry
+> sqlalchemy.url = %(POSTGRES_DATABASE_URL)s
 
 
 ## Initialize the table
 
-### For sqlite database
 
-> $VENV/bin/initialize_db development.ini
-
-### For postgres database
-
-#### Alembic
+### Alembic
 If the database and table has already been created there is no need to run anything.
 
 If the database and table has not been created, install Postgres, set up the database, and run the following command in a terminal
