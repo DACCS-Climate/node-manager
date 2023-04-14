@@ -12,8 +12,9 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.include("pyramid_chameleon")
 
-    # Add a route / path called node_all at /node/update for displaying all entries in the database at the top of the
-    # page and a blank form
+    # Add a route / path called node_all at /node/update
+    # This is the 'admin' page
+    # This is for displaying all entries in the database at the top of the page and a blank form
     config.add_route("node_all", "/node/update")
 
     # "Get and display information about node in json."
