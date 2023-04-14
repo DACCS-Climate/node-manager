@@ -1,6 +1,4 @@
-flask
 redis
-fastapi
 alembic
 pyramid==2.0.1
 waitress
