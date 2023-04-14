@@ -1,9 +1,9 @@
-# node-manager
-Web app for node manager
+# network-manager
+Web app for Network Manager.
 
-# Requirements
+Lets the admin of a particular node to edit the details of their node.
 
-FastAPI - [https://fastapi.tiangolo.com/](https://fastapi.tiangolo.com/)
+Also gets information about other nodes from the node registry and stores that information locally for the admin to use.
 
 # Development
 
@@ -82,4 +82,4 @@ If the database and table has not been created, install Postgres, set up the dat
 
 ## View the App
 
-In a browser go to `http://localhost:6543/node`
+In a browser go to `http://localhost:6543/node/update`
