@@ -25,12 +25,13 @@ class DB:
     def add_github_node_registry(self):
 
         registry = NodeRegistry()
-        github_json = registry.get_node_registry()
+        node_registry_json = registry.get_node_registry()
+        # node_info_json = registry.get_node_info()
 
         current_date = datetime.datetime.now()
 
         # if the node name exists, update the url entry for each node name
-        for key_node_name, value_url in github_json.items():
+        for key_node_name, value_url in node_registry_json.items():
 
             if self.check_entry(key_node_name):
 
