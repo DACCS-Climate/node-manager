@@ -14,4 +14,3 @@
 
 # App system files
 /network_manager.egg-info/*
-sqltutorial.sqlite
