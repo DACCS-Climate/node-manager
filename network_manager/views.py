@@ -182,4 +182,4 @@ class NodeViews:
 
         node_info_json = json.dumps(node_info_dict)
 
-        return dict(node_json=node_info_json)
+        return node_info_json
