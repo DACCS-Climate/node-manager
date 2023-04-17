@@ -3,14 +3,10 @@
 
 # Pycharm system files
 .idea/*
-/tests/__pycache__/*
+__pycache__/
 
-# Alembic files
-/network_manager/alembic/__pycache__/*
-/network_manager/alembic/versions/__pycache__/*
 # Python files
 /VENV/*
-/network_manager/__pycache__/*
 
 # App system files
 /network_manager.egg-info/*
