@@ -120,7 +120,7 @@ class NodeViews:
 
         # Checks for the submit button, then uses POST to get the submitted information
         # If not, display form using GET
-        if "submit" in self.request.params:
+        if "submit" in self.request.POST:
 
             controls = self.request.POST.items()
 
