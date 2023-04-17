@@ -2,11 +2,11 @@
 .DS_Store
 
 # Pycharm system files
-.idea/*
+.idea/
 __pycache__/
 
 # Python files
-/VENV/*
+/VENV/
 
 # App system files
-/network_manager.egg-info/*
+/network_manager.egg-info/
