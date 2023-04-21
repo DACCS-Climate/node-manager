@@ -1,6 +1,7 @@
-import datetime
+import sqlalchemy.exc
 import transaction
-from sqlalchemy import insert
+import datetime
+from typing import Optional
 from .node_registry import NodeRegistry
 from .models import (
     DBSession,
@@ -9,50 +10,47 @@ from .models import (
 
 
 class DB:
-    def check_entry(self, requested_name):
+    @staticmethod
+    def local_node() -> Optional[Node]:
+        try:
+            return DBSession.query(Node).filter(Node.local).limit(1).one()
+        except sqlalchemy.exc.NoResultFound:
+            return None
 
-        existing_entry = DBSession.query(DBSession.query(Node).filter_by(node_name=requested_name).exists()).scalar()
+    @staticmethod
+    def refresh_github_node_registry():
 
-        return existing_entry
+        node_registry_data = NodeRegistry.get_node_registry()
+        node_info_data = NodeRegistry.get_node_info()
 
-    def add_new_node_entry(self, table_name, github_json):
-        for key_node_name, value_url in github_json.items():
-            searched_node = DBSession.query(Node).filter(Node.node_name == key_node_name)
-            if searched_node is None:
-                insert(table_name).values(node_name=key_node_name, url=value_url)
-                transaction.commit()
+        with transaction.manager:
+            local_node = DB.local_node()
 
-    def add_github_node_registry(self):
+            nodes = []
 
-        registry = NodeRegistry()
-        node_registry_json = registry.get_node_registry()
-        # node_info_json = registry.get_node_info()
-
-        current_date = datetime.datetime.now()
-
-        # if the node name exists, update the url entry for each node name
-        for key_node_name, value_url in node_registry_json.items():
-
-            if self.check_entry(key_node_name):
-
-                DBSession.query(Node).filter(Node.node_name == key_node_name).update({Node.url: value_url})
-                transaction.commit()
-
-            else:
-                # If the node name does not exist, add the items in the github node_registry
-                with transaction.manager:
-
-                    model = Node(
-                        node_name=key_node_name,
-                        node_description="",
-                        location="",
-                        affiliation="",
-                        url=value_url,
-                        support_contact_email="",
-                        deploy_start_date=current_date,
-                        data=None,
-                        compute=None,
-                        administrator="",
+            for name, url in node_registry_data.items():
+                if local_node is None or name != local_node.name:
+                    info = node_info_data[name]
+                    capabilities = info.pop("capabilities")
+                    try:
+                        deployed_since = datetime.datetime.fromisoformat(info.pop("deployed_since"))
+                    except ValueError:
+                        # TODO: this is a temporary workaround until
+                        #  https://github.com/DACCS-Climate/DACCS-node-registry/issues/2 is resolved
+                        #  after it is resolved, this should raise an exception
+                        deployed_since = datetime.datetime.now()
+                    nodes.append(
+                        Node(
+                            **{
+                                "name": name,
+                                "url": url,
+                                "deployed_since": deployed_since,
+                                **info,
+                                "data": ("data" in capabilities),
+                                "compute": ("compute" in capabilities),
+                            }
+                        )
                     )
 
-                    DBSession.add(model)
+            DBSession.query(Node).filter(Node.local.is_(None)).delete()
+            DBSession.add_all(nodes)

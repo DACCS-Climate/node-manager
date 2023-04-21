@@ -15,15 +15,13 @@ requires = [
     "sqlalchemy",
     "waitress",
     "zope.sqlalchemy",
+    "requests",
 ]
 
 # List of dependencies installed via `pip install -e ".[dev]"`
 # by virtue of the Setuptools `extras_require` value in the Python
 # dictionary below.
-dev_requires = [
-    "pytest",
-    "webtest",
-]
+dev_requires = ["pytest", "webtest", "pyramid_debugtoolbar"]
 
 setup(
     name="network_manager",
