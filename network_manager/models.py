@@ -22,6 +22,9 @@ Base = declarative_base()
 
 # Define model for node table
 class Node(Base):
+    """
+    Defines the "nodes" table for use in sqlalchemy
+    """
 
     __tablename__ = "nodes"
 

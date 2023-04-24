@@ -11,12 +11,28 @@ from .db import DB
 
 
 class NodeViews:
+    """
+    This contains functions for the views of the network manager.
+
+    It also defines the form used on the admin page (node_update view)
+    """
+
     def __init__(self, request):
 
         self.request = request
 
     @property
     def node_form(self):
+        """
+        Defines the form used on the admin page (node_update view).
+
+        Uses Colander schemas and the Deform library to create the form fields.
+
+        When the form is first loaded (with no node_id passed) the form will show blank values as default values in the
+        form fields.
+        Once a node_id is passed into the view it will get the details for the node from the database and populate the
+        form.
+        """
         # On page load get the passed node ID and get the node details to populate the form fields
 
         # If no node_id is passed, form defaults are blank
@@ -94,6 +110,15 @@ class NodeViews:
 
     @view_config(route_name="node_all", renderer="templates/node_update.pt")
     def display_all_nodes(self):
+        """
+        Display a list of all nodes on the admin page above the form
+
+        Get information from the github node registry and update the database.
+        Display the most up to date information about all nodes as a list above the update form.
+
+        Takes node_id from the querystring.
+        Returns the form and all records from the "nodes" table.
+        """
         form = self.node_form.render()
 
         # Get information from github node registry and display list of all nodes
@@ -106,6 +131,17 @@ class NodeViews:
 
     @view_config(route_name="node_update", renderer="templates/node_update.pt")
     def node_update(self):
+        """
+        Displays a form and lets the user edit details about a node.
+
+        Takes in a node ID from the querystring and retrieves the record from the database to populate the form fields.
+        Returns the title "Node Update" and the populated form.
+
+        If "submit" is found in the POST on form submit it updates the database.
+        Returns an updated page title "Updated Successfully" and the node ID to populate the form fields with
+        the updated content.
+
+        """
         title = "Node Update"
 
         # Get information from github node registry and display list of all nodes
@@ -171,6 +207,10 @@ class NodeViews:
 
     @view_config(route_name="node_info", renderer="json")
     def node_info_view(self):
+        """
+        Gets the information for a specific node using the node ID from the querystring.
+        Returns the node name and node url as a json.
+        """
 
         node_info_dict = {}
 
