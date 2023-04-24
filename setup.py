@@ -25,6 +25,10 @@ dev_requires = [
     "webtest",
 ]
 
+tests_require = [
+    "pytest",
+]
+
 setup(
     name="network_manager",
     install_requires=requires,
