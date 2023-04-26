@@ -10,19 +10,18 @@ def main(global_config, **settings):
     Base.metadata.bind = engine
 
     config = Configurator(settings=settings)
+
     config.include("pyramid_chameleon")
 
-    # Add a route / path called node_all at /node/update
-    # This is the 'admin' page
-    # This is for displaying all entries in the database at the top of the page and a blank form
-    config.add_route("node_all", "/node/update")
+    config.add_route("node_edit", "/node/edit", request_method=("POST", "GET"))
 
-    # "Get and display information about node in json."
-    config.add_route("node_info", "/node/info/{node_id}")
+    config.add_route("node_info", "/node/{node_id}", request_method="GET")
 
-    # Add a route / path called node_update at /node/update.
-    # This is the 'admin' page where a specific node's details can be updated in the database
-    config.add_route("node_update", "/node/update/{node_id}")
+    config.add_route("local_node_info", "/node", request_method="GET")
+
+    config.add_route("nodes_info", "/nodes", request_method="GET")
+
+    config.add_route("refresh_registry", "/refresh", request_method="PATCH")
 
     config.add_static_view("deform_static", "deform:static/")
 

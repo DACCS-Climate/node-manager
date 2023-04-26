@@ -1,6 +1,7 @@
-import datetime
+import sqlalchemy.exc
 import transaction
-from sqlalchemy import insert
+import datetime
+from typing import Optional
 from .node_registry import NodeRegistry
 from .models import (
     DBSession,
@@ -9,68 +10,62 @@ from .models import (
 
 
 class DB:
+
     """
     Contains functions for performing database operations
     """
 
-    def check_entry(self, requested_name):
+    @staticmethod
+    def local_node() -> Optional[Node]:
         """
-        Checks if the entry exists in the database using the passed node name.
+        Checks if the entry exists in the database using the 'local' column name in the database.
 
-        If the entry exists it will return True.  Returns False otherwise.
+        If the entry exists it will return the entry.  Returns None otherwise.
         """
+        try:
+            return DBSession.query(Node).filter(Node.local).limit(1).one()
+        except sqlalchemy.exc.NoResultFound:
+            return None
 
-        existing_entry = DBSession.query(DBSession.query(Node).filter_by(node_name=requested_name).exists()).scalar()
+    @staticmethod
+    def refresh_github_node_registry():
 
-        return existing_entry
+        node_registry_data = NodeRegistry.get_node_registry()
+        node_info_data = NodeRegistry.get_node_info()
 
-    def add_new_node_entry(self, table_name, github_json):
-        """
-        Adds a new entry into the database.
-
-        Takes the table name and the node information retrieved from the github repository.
-        If the node name is not found a new record is inserted into the database with that specific node name and url.
-        """
-        for key_node_name, value_url in github_json.items():
-            searched_node = DBSession.query(Node).filter(Node.node_name == key_node_name)
-            if searched_node is None:
-                insert(table_name).values(node_name=key_node_name, url=value_url)
-                transaction.commit()
-
-    def add_github_node_registry(self):
         """
         Gets information from the github node registry repository and updates the node information if the node exists
         in the database or inserts a new record if the node does not exist in the database.
         """
-        registry = NodeRegistry()
-        node_registry_json = registry.get_node_registry()
-        # node_info_json = registry.get_node_info()
 
-        current_date = datetime.datetime.now()
+        with transaction.manager:
+            local_node = DB.local_node()
 
-        # if the node name exists, update the url entry for each node name
-        for key_node_name, value_url in node_registry_json.items():
+            nodes = []
 
-            if self.check_entry(key_node_name):
-
-                DBSession.query(Node).filter(Node.node_name == key_node_name).update({Node.url: value_url})
-                transaction.commit()
-
-            else:
-                # If the node name does not exist, add the items in the github node_registry
-                with transaction.manager:
-
-                    model = Node(
-                        node_name=key_node_name,
-                        node_description="",
-                        location="",
-                        affiliation="",
-                        url=value_url,
-                        support_contact_email="",
-                        deploy_start_date=current_date,
-                        data=None,
-                        compute=None,
-                        administrator="",
+            for name, url in node_registry_data.items():
+                if local_node is None or name != local_node.name:
+                    info = node_info_data[name]
+                    capabilities = info.pop("capabilities")
+                    try:
+                        deployed_since = datetime.datetime.fromisoformat(info.pop("deployed_since"))
+                    except ValueError:
+                        # TODO: this is a temporary workaround until
+                        #  https://github.com/DACCS-Climate/DACCS-node-registry/issues/2 is resolved
+                        #  after it is resolved, this should raise an exception
+                        deployed_since = datetime.datetime.now()
+                    nodes.append(
+                        Node(
+                            **{
+                                "name": name,
+                                "url": url,
+                                "deployed_since": deployed_since,
+                                **info,
+                                "data": ("data" in capabilities),
+                                "compute": ("compute" in capabilities),
+                            }
+                        )
                     )
 
-                    DBSession.add(model)
+            DBSession.query(Node).filter(Node.local.is_(None)).delete()
+            DBSession.add_all(nodes)

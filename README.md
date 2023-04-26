@@ -95,8 +95,7 @@ If the table has already been created there is no need to run anything.
 
 If the table has not been created, run the following command in a terminal
 
-> alembic upgrade head
-
+> alembic -c development.ini upgrade head
 
 ## Start the App
 

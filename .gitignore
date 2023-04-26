@@ -10,3 +10,6 @@ __pycache__/
 
 # App system files
 /network_manager.egg-info/
+
+# database
+*.sqlite
