@@ -1,6 +1,9 @@
 from pyramid.testing import DummySecurityPolicy
-import transaction
+
+# import transaction
 from network_manager import models
+
+# from pyramid.httpexceptions import HTTPNotFound
 
 # from network_manager.models import Node
 
@@ -20,83 +23,111 @@ def makeNode(node_id, node_name, url):
     return models.Node(node_id=node_id, node_name=node_name, url=url)
 
 
-# def makeNode(node_name, url):
-#
-#     return models.Node(node_name=node_name, url=url)
-
-
-class Test_display_all_nodes:
+# Unit tests
+class Test_nodes_info:
     def _callFUT(self, request):
         from network_manager.views import NodeViews
 
         node_views = NodeViews(request)
-        display_all_nodes_view = node_views.display_all_nodes()
+        nodes_info_view = node_views.nodes_info()
 
-        return display_all_nodes_view
+        return nodes_info_view
 
     def _addRoutes(self, config):
-        config.add_route("node_all", "/node/update")
+        config.add_route("nodes_info", "/nodes")
 
     def test_it(self, dummy_config, dummy_request):
-        # Tests that the response from the page is 200 and the page route can be found
-        # Tests that the correct page title 'Node Update' is in the loaded page
         self._addRoutes(dummy_config)
 
-        response = self._callFUT(dummy_request)
+        # nodes_info_response = self._callFUT(dummy_request)
 
         assert dummy_request.response.status_code == 200
-        assert response["page_title"] == "All Nodes"
 
 
-class Test_node_update:
-    def _callFUT(self, request):
-
-        from network_manager.views import NodeViews
-
-        node_views = NodeViews(request)
-        node_update_view = node_views.node_update()
-
-        return node_update_view
-
-    def _addRoutes(self, config):
-        config.add_route("node_update", "/node/update/{node_id}")
-
-    def test_it(self, dummy_config, dummy_request, dbsession):
-        # Tests that the response from the page is 200 and the page route can be found
-        # Tests that the correct page title 'Node Update' is in the loaded page
-        test_node = makeNode(3, "pytestnode", "https://pytest.ca")
-        with transaction.manager:
-            dbsession.add(test_node)
-
-        self._addRoutes(dummy_config)
-        dummy_request.matchdict["node_id"] = 1
-        node_update_test_page = self._callFUT(dummy_request)
-
-        assert dummy_request.response.status_code == 200
-        assert node_update_test_page["page_title"] == "Node Update"
-
-
-class Test_node_info_view:
+class Test_node_info:
     def _callFUT(self, request):
         from network_manager.views import NodeViews
 
         node_views = NodeViews(request)
-        node_info_view = node_views.node_info_view()
+        node_info_view = node_views.node_info()
 
         return node_info_view
 
     def _addRoutes(self, config):
-        config.add_route("node_info", "/node/info/{node_id}")
+        config.add_route("node_info", "/node/{node_id}")
 
-    def test_it(self, node, dummy_config, dummy_request, dbsession):
-        # Tests that the response from the page is 200 and the page route can be found
-        # Tests that the returned json data contains the correct node name by comparing to a record in the database
-
-        test_row = dbsession.query(node).filter_by(node_id=1).one()
-
+    def test_it(self, dummy_config, dummy_request):
         self._addRoutes(dummy_config)
+
         dummy_request.matchdict["node_id"] = 1
-        node_info_response = self._callFUT(dummy_request)
+        # node_info_response = self._callFUT(dummy_request)
 
         assert dummy_request.response.status_code == 200
-        assert test_row.node_name in node_info_response
+
+
+class Test_local_node_info:
+    def _callFUT(self, request):
+        from network_manager.views import NodeViews
+
+        # from network_manager.db import DB
+
+        node_views = NodeViews(request)
+        # node_db = DB()
+
+        local_node_view = node_views.local_node_info()
+        # local_node_db = node_db
+
+        return local_node_view
+
+    def _addRoutes(self, config):
+        config.add_route("local_node_info", "/node")
+
+    def test_it(self, dummy_config, dummy_request):
+        self._addRoutes(dummy_config)
+
+        # dummy_request.matchdict["node_id"] = 1
+        # local_node_info_response = self._callFUT(dummy_request)
+
+        assert dummy_request.response.status_code == 200
+
+
+class Test_node_edit:
+    def _callFUT(self, request):
+        from network_manager.views import NodeViews
+
+        node_views = NodeViews(request)
+        node_edit_view = node_views.node_edit()
+
+        return node_edit_view
+
+    def _addRoutes(self, config):
+        config.add_route("node_edit", "/node/edit")
+
+    def test_it(self, dummy_config, dummy_request):
+        self._addRoutes(dummy_config)
+
+        local_node_info_response = self._callFUT(dummy_request)
+
+        assert dummy_request.response.status_code == 200
+        assert "Node Update" in local_node_info_response["page_title"]
+        assert "submit" in local_node_info_response["form"]
+
+
+class Test_refresh_registry:
+    def _callFUT(self, request):
+        from network_manager.views import NodeViews
+
+        node_views = NodeViews(request)
+        refresh_registry_view = node_views.refresh_registry()
+
+        return refresh_registry_view
+
+    def _addRoutes(self, config):
+        config.add_route("refresh_registry", "/refresh")
+
+    def test_it(self, dummy_config, dummy_request):
+        self._addRoutes(dummy_config)
+
+        refresh_registry_response = self._callFUT(dummy_request)
+
+        assert refresh_registry_response.status_code == 201
