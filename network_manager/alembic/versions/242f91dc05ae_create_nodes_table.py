@@ -32,7 +32,6 @@ def upgrade() -> None:
         sa.Column("administrators", sa.Text(), nullable=True),
         sa.Column("local", sa.Boolean(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("local"),
         sa.UniqueConstraint("name"),
         sa.UniqueConstraint("url"),
     )
