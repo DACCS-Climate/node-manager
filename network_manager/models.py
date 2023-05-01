@@ -38,7 +38,7 @@ class Node(Base):
     data = Column(Boolean, default=False, nullable=False)
     compute = Column(Boolean, default=False, nullable=False)
     administrators = Column(Text)
-    local = Column(Boolean, nullable=True, unique=True, default=None)
+    local = Column(Boolean, nullable=True, default=None)
 
     def as_dict(self):
         d = {c.name: getattr(self, c.name) for c in self.__table__.columns}
