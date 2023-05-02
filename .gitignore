@@ -1,1 +1,15 @@
+# Mac system files
 .DS_Store
+
+# Pycharm system files
+.idea/
+__pycache__/
+
+# Python files
+/VENV/
+
+# App system files
+/network_manager.egg-info/
+
+# database
+*.sqlite

@@ -1,5 +1,0 @@
-flask
-redis
-fastapi
-pyramid==2.0.1
-waitress
