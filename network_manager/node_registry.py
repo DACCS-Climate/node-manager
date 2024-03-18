@@ -3,7 +3,6 @@ from .constants import NM_NODE_REGISTRY_URL, NM_NODE_INFO_URL
 
 
 class NodeRegistry:
-
     """
     Contains functions for retrieving information from the github node registry
     """
@@ -26,7 +25,6 @@ class NodeRegistry:
 
     @staticmethod
     def get_node_info():
-
         """
         Gets information from the node info repository at the given url.
         Returns the information in json format
