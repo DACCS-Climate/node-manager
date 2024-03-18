@@ -44,7 +44,6 @@ def get_session_factory(engine):
 
 
 def get_tm_session(session_factory, transaction_manager, request=None):
-
     """
 
     Get a ``sqlalchemy.orm.Session`` instance backed by a transaction.

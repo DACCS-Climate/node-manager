@@ -10,7 +10,6 @@ from .models import (
 
 
 class DB:
-
     """
     Contains functions for performing database operations
     """
